@@ -6,3 +6,4 @@ class Branch(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     college_id = Column(Integer, ForeignKey("colleges.id"))
+    capacity = Column(Integer, nullable=True)
