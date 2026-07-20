@@ -16,6 +16,7 @@ from models.user import User
 from models.college import College
 from models.branch import Branch
 from models.cutoff import Cutoff
+from models.exam import Exam
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
