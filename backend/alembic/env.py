@@ -17,6 +17,7 @@ from models.college import College
 from models.branch import Branch
 from models.cutoff import Cutoff
 from models.exam import Exam
+from models.category_seat import CategorySeat
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
