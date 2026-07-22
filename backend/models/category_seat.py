@@ -12,3 +12,7 @@ class CategorySeat(Base):
     total_seats = Column(Integer, default=0)
     round = Column(Integer, default=1)
     year = Column(Integer, default=2025)
+    pwd_seats = Column(Integer, default=0)
+    def_seats = Column(Integer, default=0)
+    ews_seats = Column(Integer, default=0)
+    tfws_seats = Column(Integer, default=0)

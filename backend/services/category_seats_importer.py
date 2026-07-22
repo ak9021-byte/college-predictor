@@ -7,7 +7,7 @@ from models.category_seat import CategorySeat
 CATEGORIES = ["OPEN", "SC", "ST", "VJ_DT", "NTB", "NTC", "NTD", "OBC", "SEBC"]
 
 def import_category_seats(file_path):
-    df = pd.read_excel(file_path, sheet_name="Sheet1")
+    df = pd.read_excel(file_path, sheet_name="Seat Matrix (All Courses)")
     db = SessionLocal()
 
     created = 0
@@ -31,22 +31,24 @@ def import_category_seats(file_path):
         if not branch:
             total_seats = row.get("Total Seats (Sanctioned Intake)", 0)
             total_seats = int(total_seats) if pd.notna(total_seats) else 0
-            branch = Branch(
-                name=branch_name,
-                college_id=college.id,
-                capacity=total_seats
-            )
+            branch = Branch(name=branch_name, college_id=college.id, capacity=total_seats)
             db.add(branch)
             db.commit()
             db.refresh(branch)
             branches_created += 1
 
-        for cat in CATEGORIES:
-            general_col = f"{cat} - General"
-            ladies_col = f"{cat} - Ladies"
+        pwd = row.get("PWD Seats (within above, horizontal reservation)", 0)
+        defence = row.get("Defence (DEF) Seats (within above, horizontal reservation)", 0)
+        ews = row.get("EWS Seats (separate, economically weaker section)", 0)
+        tfws = row.get("TFWS Seats (extra, fee-waiver only)", 0)
+        pwd = int(pwd) if pd.notna(pwd) else 0
+        defence = int(defence) if pd.notna(defence) else 0
+        ews = int(ews) if pd.notna(ews) else 0
+        tfws = int(tfws) if pd.notna(tfws) else 0
 
-            general = row.get(general_col, 0)
-            ladies = row.get(ladies_col, 0)
+        for cat in CATEGORIES:
+            general = row.get(f"{cat} - General", 0)
+            ladies = row.get(f"{cat} - Ladies", 0)
             general = int(general) if pd.notna(general) else 0
             ladies = int(ladies) if pd.notna(ladies) else 0
 
@@ -64,6 +66,10 @@ def import_category_seats(file_path):
                 general_seats=general,
                 ladies_seats=ladies,
                 total_seats=general + ladies,
+                pwd_seats=pwd,
+                def_seats=defence,
+                ews_seats=ews,
+                tfws_seats=tfws,
             )
             db.add(cat_seat)
             created += 1
@@ -76,4 +82,4 @@ def import_category_seats(file_path):
     print(f"Skipped (already existed): {skipped_duplicate}")
 
 if __name__ == "__main__":
-    import_category_seats("data/Category_Seats_2025.xlsx")
+    import_category_seats("data/Seat_Matrix.xlsx")
