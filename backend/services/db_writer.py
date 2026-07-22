@@ -25,7 +25,7 @@ def write_seat_data_to_db(file_path):
             continue
 
         # Get or create the college
-        college = db.query(College).filter_by(code=row["college_code"]).first()
+        college = db.query(College).filter_by(name=row["college_name"]).first()
         if not college:
             college = College(code=row["college_code"], name=row["college_name"])
             db.add(college)
