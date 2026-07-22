@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException
 from passlib.context import CryptContext
 from db.session import SessionLocal
 from models.user import User
-from schemas.user import SignupRequest, UserResponse
+from schemas.user import SignupRequest, UserResponse, LoginRequest, TokenResponse
+from core.security import verify_password, create_access_token
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -28,3 +29,15 @@ def signup(request: SignupRequest):
     db.close()
 
     return new_user
+
+@router.post("/auth/login", response_model=TokenResponse)
+def login(request: LoginRequest):
+    db = SessionLocal()
+    user = db.query(User).filter_by(email=request.email).first()
+    db.close()
+
+    if not user or not verify_password(request.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    token = create_access_token(user.id, user.role)
+    return TokenResponse(access_token=token, role=user.role)
