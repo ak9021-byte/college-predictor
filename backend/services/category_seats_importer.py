@@ -16,6 +16,9 @@ def import_category_seats(file_path):
     skipped_duplicate = 0
 
     for _, row in df.iterrows():
+        if pd.isna(row["College Code"]):
+            skipped_no_college += 1
+            continue
         college_code = str(int(row["College Code"])).zfill(5)
         branch_name = str(row["Department / Course"]).strip().title()
         choice_code = str(row["Choice Code"])
