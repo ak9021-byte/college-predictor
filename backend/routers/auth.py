@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from passlib.context import CryptContext
 from db.session import SessionLocal
 from models.user import User
 from schemas.user import SignupRequest, UserResponse, LoginRequest, TokenResponse
 from core.security import verify_password, create_access_token
+from dependencies import get_current_user, require_admin
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -41,3 +42,11 @@ def login(request: LoginRequest):
 
     token = create_access_token(user.id, user.role)
     return TokenResponse(access_token=token, role=user.role)
+
+@router.get("/auth/me")
+def get_me(current_user = Depends(get_current_user)):
+    return {"id": current_user.id, "email": current_user.email, "role": current_user.role}
+
+@router.get("/auth/admin-only")
+def admin_only_route(current_user = Depends(require_admin)):
+    return {"message": f"Welcome admin {current_user.email}"}
